@@ -1,7 +1,7 @@
 # Step 1: Use a Maven image to build the application
 FROM maven:3.9.6-eclipse-temurin-17 AS builder
 
-# Accept version number as a build argument
+# version arg default 0
 ARG VERSION_NUM=0
 
 WORKDIR /app
@@ -11,13 +11,12 @@ COPY src ./src
 
 # Use Maven to package the application with the version number
 RUN mvn clean package -Drevision=${VERSION_NUM}
-RUN ls target && echo "@@@@@@@@@@@@@@@@@@@@@@@@" && pwd
-# Step 2: Use a lightweight JRE image to run the application
+
+# Step 2: copy to a new container and use it to minimize the size
 FROM eclipse-temurin:17-jre-alpine
 
 WORKDIR /app
 
-# Accept the same build argument in the runtime stage
 ARG VERSION_NUM=0
 
 # Copy the built JAR with the specified version
