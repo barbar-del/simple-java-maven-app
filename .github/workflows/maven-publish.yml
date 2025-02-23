@@ -18,27 +18,13 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
-    - name: Set up Java
-      uses: actions/setup-java@v3
-      with:
-        distribution: 'temurin'
-        java-version: '11'
-
-    - name: Increment version in pom.xml
-      run: |
-        CURRENT_VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
-        BASE_VERSION=$(echo $CURRENT_VERSION | sed 's/\.[0-9]*$//')
-        PATCH_VERSION=$(echo $CURRENT_VERSION | sed 's/^.*\.\([0-9]*\)$/\1/')
-        NEW_PATCH_VERSION=$((PATCH_VERSION + 1))
-        NEW_VERSION="${BASE_VERSION}.${NEW_PATCH_VERSION}"
-        mvn versions:set -DnewVersion=$NEW_VERSION
-        mvn versions:commit
-
+    
+    
     - name: Log in to DockerHub
       run: echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
 
     - name: Build Docker image
-      run: docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/simple-java-maven-app:latest .
+      run: docker build --build-arg VERSION_NUM=${{ github.run_number }}  -t ${{ secrets.DOCKERHUB_USERNAME }}/simple-java-maven-app:latest .
 
     - name: Push Docker image
       run: docker push ${{ secrets.DOCKERHUB_USERNAME }}/simple-java-maven-app:latest
