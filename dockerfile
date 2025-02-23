@@ -10,7 +10,7 @@ COPY pom.xml .
 COPY src ./src
 
 # Use Maven to package the application with the version number
-RUN mvn clean package -Drevision=1.0.${VERSION_NUM}
+RUN mvn clean package -Drevision=${VERSION_NUM}
 RUN ls target && echo "@@@@@@@@@@@@@@@@@@@@@@@@" && pwd
 # Step 2: Use a lightweight JRE image to run the application
 FROM eclipse-temurin:17-jre-alpine
