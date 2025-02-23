@@ -1,13 +1,13 @@
-# Use an official OpenJDK 11 runtime as a base image
-FROM openjdk:11-jre-slim
-
-# Set the working directory inside the container
+# Step 1: Use a Maven image to build the application
+FROM maven:3.9.6-eclipse-temurin-17 AS builder
 WORKDIR /app
+COPY pom.xml .
+COPY src ./src
+RUN mvn clean package
 
-# Copy the JAR file (matching my-app*.jar) into the container
-COPY ./my-app*.jar /app/my-app.jar
-
-
-# Command to run the application
-CMD ["java", "-jar", "/app/my-app.jar"]
+# Step 2: Use a lightweight JRE image to run the application
+FROM eclipse-temurin:17-jre-alpine
+WORKDIR /app
+COPY --from=builder /app/target/my-app-1.0-SNAPSHOT.jar app.jar
+CMD ["java", "-jar", "app.jar"]
 
