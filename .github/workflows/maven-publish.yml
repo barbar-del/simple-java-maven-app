@@ -28,3 +28,17 @@ jobs:
 
     - name: Push Docker image
       run: docker push ${{ secrets.DOCKERHUB_USERNAME }}/simple-java-maven-app:latest
+
+    - name: ssh connect to deploy
+      run: ssh -i ${{ secrets.SSH_KEY }} ubuntu@31.26.27.195
+
+    - name: instal dependensies
+      run: sudo apt install docker.io -y
+
+#    - name: remove and stop  container
+#      run: sudo docker stop hellow && sudo dokcer rm hellow 
+     
+    - name: run the docker 
+      run: yes | docker run --pull=always --name hellow ${{ secrets.DOCKERHUB_USERNAME }}/simple-java-maven-app:latest
+ 
+
